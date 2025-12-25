@@ -56,7 +56,7 @@ public class PlayerPanel extends FContainer {
     private final int index;
     private final boolean allowNetworking;
     private boolean mayEdit = true;
-    private boolean isReady, mayControl, mayRemove, useAiSimulation;
+    private boolean isReady, mayControl, mayRemove, useAiSimulation, useLlmAi;
     private LobbySlotType type = LobbySlotType.LOCAL;
 
     private final FLabel nameRandomiser;
@@ -923,15 +923,26 @@ public class PlayerPanel extends FContainer {
     }
 
     public Set<AIOption> getAiOptions() {
-        return isSimulatedAi()
-                ? ImmutableSet.of(AIOption.USE_SIMULATION)
-                : Collections.emptySet();
+        if (!isAi()) {
+            return Collections.emptySet();
+        }
+        Set<AIOption> options = new java.util.HashSet<>();
+        if (useAiSimulation) {
+            options.add(AIOption.USE_SIMULATION);
+        }
+        if (useLlmAi) {
+            options.add(AIOption.USE_LLM_AI);
+        }
+        return options.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(options);
     }
     private boolean isSimulatedAi() {
         return isAi() && useAiSimulation;
     }
     public void setUseAiSimulation(final boolean useAiSimulation0) {
         useAiSimulation = useAiSimulation0;
+    }
+    public void setUseLlmAi(final boolean useLlmAi0) {
+        useLlmAi = useLlmAi0;
     }
 
     public int getTeam() {

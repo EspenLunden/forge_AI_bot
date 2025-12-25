@@ -1,0 +1,85 @@
+{
+  "name": "Blue",
+  "mainDeck": [
+    {
+      "type": "card",
+      "count": 14,
+      "cardName": "Island|ODY"
+    },
+    {
+      "type": "card",
+      "count": 13,
+      "cardName": "Swamp|ODY"
+    },
+    {
+      "count": 9,
+      "colors": [
+        "blue"
+      ],
+      "rarity": [
+        "Uncommon",
+        "Common"
+      ],
+      "manaCosts": [
+        1,
+        2
+      ]
+    },
+    {
+      "count": 6,
+      "colors": [
+        "black"
+      ],
+      "rarity": [
+        "Common"
+      ],
+      "manaCosts": [
+        1,
+        2
+      ]
+    },
+    {
+      "count": 6,
+      "colors": [
+        "blue"
+      ],
+      "rarity": [
+        "Uncommon",
+        "Common"
+      ],
+      "manaCosts": [
+        3,
+        4
+      ]
+    },
+    {
+      "count": 3,
+      "colors": [
+        "black"
+      ],
+      "rarity": [
+        "Common"
+      ],
+      "manaCosts": [
+        3,
+        4
+      ]
+    },
+    {
+      "count": 9,
+      "colors": [
+        "blue"
+      ],
+      "rarity": [
+        "rare"
+      ],
+      "manaCosts": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  ]
+}

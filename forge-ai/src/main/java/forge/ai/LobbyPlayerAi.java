@@ -14,11 +14,13 @@ public class LobbyPlayerAi extends LobbyPlayer implements IGameEntitiesFactory {
     private boolean rotateProfileEachGame;
     private boolean allowCheatShuffle;
     private boolean useSimulation;
+    private boolean useLlmAi;
 
     public LobbyPlayerAi(String name, Set<AIOption> options) {
         super(name);
-        if (options != null && options.contains(AIOption.USE_SIMULATION)) {
-            this.useSimulation = true;
+        if (options != null) {
+            this.useSimulation = options.contains(AIOption.USE_SIMULATION);
+            this.useLlmAi = options.contains(AIOption.USE_LLM_AI);
         }
     }
 
@@ -39,12 +41,51 @@ public class LobbyPlayerAi extends LobbyPlayer implements IGameEntitiesFactory {
     public void setRotateProfileEachGame(boolean rotateProfileEachGame) {
         this.rotateProfileEachGame = rotateProfileEachGame;
     }
+    
+    public boolean isUseLlmAi() {
+        return useLlmAi;
+    }
+    
+    public void setUseLlmAi(boolean useLlmAi) {
+        this.useLlmAi = useLlmAi;
+    }
 
-    private PlayerControllerAi createControllerFor(Player ai) {
+    private PlayerController createControllerFor(Player ai) {
+        if (useLlmAi) {
+            return createLlmController(ai);
+        }
+        
         PlayerControllerAi result = new PlayerControllerAi(ai.getGame(), ai, this);
         result.setUseSimulation(useSimulation);
         result.allowCheatShuffle(allowCheatShuffle);
         return result;
+    }
+    
+    private PlayerController createLlmController(Player ai) {
+        try {
+            // Dynamically load LLM controller if available
+            Class<?> llmControllerClass = Class.forName("forge.ai.llm.PlayerControllerLlm");
+            Class<?> llmClientFactoryClass = Class.forName("forge.ai.llm.LlmClientFactory");
+            Class<?> llmClientClass = Class.forName("forge.ai.llm.LlmClient");
+            
+            // Get the factory method
+            java.lang.reflect.Method createMethod = llmClientFactoryClass.getMethod("create", String.class);
+            Object llmClient = createMethod.invoke(null, "local");
+            
+            // Create the LLM controller
+            java.lang.reflect.Constructor<?> constructor = llmControllerClass.getConstructor(
+                Object.class, Object.class, Object.class, llmClientClass, double.class, boolean.class
+            );
+            
+            return (PlayerController) constructor.newInstance(ai.getGame(), ai, this, llmClient, 0.65, true);
+        } catch (Exception e) {
+            System.err.println("Could not initialize LLM AI controller: " + e.getMessage());
+            // Fallback to standard AI
+            PlayerControllerAi result = new PlayerControllerAi(ai.getGame(), ai, this);
+            result.setUseSimulation(useSimulation);
+            result.allowCheatShuffle(allowCheatShuffle);
+            return result;
+        }
     }
 
     @Override

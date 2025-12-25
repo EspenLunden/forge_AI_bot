@@ -74,6 +74,7 @@ public class PlayerPanel extends FPanel {
     private FRadioButton radioHuman;
     private FRadioButton radioAi;
     private JCheckBoxMenuItem radioAiUseSimulation;
+    private JCheckBoxMenuItem radioAiUseLlm;
     private FRadioButton radioOpen;
     private FCheckBox chkReady;
 
@@ -449,15 +450,27 @@ public class PlayerPanel extends FPanel {
     }
 
     public Set<AIOption> getAiOptions() {
-        return isSimulatedAi()
-                ? ImmutableSet.of(AIOption.USE_SIMULATION)
-                : Collections.emptySet();
+        if (!radioAi.isSelected()) {
+            return Collections.emptySet();
+        }
+        
+        Set<AIOption> options = new java.util.HashSet<>();
+        if (radioAiUseSimulation.isSelected()) {
+            options.add(AIOption.USE_SIMULATION);
+        }
+        if (radioAiUseLlm.isSelected()) {
+            options.add(AIOption.USE_LLM_AI);
+        }
+        return options.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(options);
     }
     private boolean isSimulatedAi() {
         return radioAi.isSelected() && radioAiUseSimulation.isSelected();
     }
     public void setUseAiSimulation(final boolean useSimulation) {
         radioAiUseSimulation.setSelected(useSimulation);
+    }
+    public void setUseLlmAi(final boolean useLlm) {
+        radioAiUseLlm.setSelected(useLlm);
     }
 
     public boolean isArchenemy() {
@@ -594,6 +607,11 @@ public class PlayerPanel extends FPanel {
         radioAiUseSimulation = new JCheckBoxMenuItem(localizer.getMessage("lblUseSimulation"));
         menu.add(radioAiUseSimulation);
         radioAiUseSimulation.addActionListener(e -> lobby.firePlayerChangeListener(index));
+        
+        radioAiUseLlm = new JCheckBoxMenuItem("Use LLM AI");
+        menu.add(radioAiUseLlm);
+        radioAiUseLlm.addActionListener(e -> lobby.firePlayerChangeListener(index));
+        
         radioAi.setComponentPopupMenu(menu);
 
         radioHuman.addMouseListener(radioMouseAdapter(radioHuman, LobbySlotType.LOCAL));
